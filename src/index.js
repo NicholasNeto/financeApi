@@ -12,7 +12,7 @@ const customers = []
 function verifyIfExistsAccountCPF(request, response, next) {
     const { cpf } = request.headers
     const customer = customers.find((customer) => customer.cpf === cpf)
-    
+
     if (!customer) {
         return response.status(400).json({ error: 'Customer not found' })
     }
@@ -23,15 +23,15 @@ function verifyIfExistsAccountCPF(request, response, next) {
 }
 
 function getBalance(statement) {
-    const balance = statement.reduce(( acc, operation ) => {
-        if(operation.type === 'credit') {
+    const balance = statement.reduce((acc, operation) => {
+        if (operation.type === 'credit') {
             return acc + operation.amount;
         } else {
             return acc - operation.amount;
-        } 
+        }
     }, 0)
 
-    return balance 
+    return balance
 }
 
 
@@ -84,7 +84,7 @@ app.get('/statement', verifyIfExistsAccountCPF, (request, response) => {
 app.get('/statement/date', verifyIfExistsAccountCPF, (request, response) => {
     const { customer } = request
     const { date } = request.query
-    const dateFormat =  new Date(date + " 00:00")
+    const dateFormat = new Date(date + " 00:00")
 
     const statements = customer.statement.filter(statement => {
         statement.created_at.toDateString() === new Date(dateFormat).toDateString()
@@ -111,12 +111,12 @@ app.post('/deposit', verifyIfExistsAccountCPF, (request, response) => {
 app.post('/withdraw', verifyIfExistsAccountCPF, (request, response) => {
     const { amount } = request.body
     const { customer } = request
- 
-    const balance =  getBalance(customer.statement)
-    
-    if(balance < amount) {
-        return response.status(400).json({error: 'Insufficient funds !'}) 
-    } 
+
+    const balance = getBalance(customer.statement)
+
+    if (balance < amount) {
+        return response.status(400).json({ error: 'Insufficient funds !' })
+    }
 
     const statementOperation = {
         amount,
